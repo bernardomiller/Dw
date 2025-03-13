@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Perfil Pessoal</title>
+</head>
+<header>
+    <div>Foto</div>
+</header>
+
+<body>
+    <main>
+        <div><img
+                src=https://th.bing.com/th/id/OIP.OBeteUt23culohyA599aIwAAAA?rs=1&pid=ImgDetMain
+        </div>
+        <h1>Bernardo Esteves Miller Machado
+         Aluno de ciência de dados no IBMEC
+
+        
+        </h1>
+        <ul>
+            <h3>Hobbies;</h3>
+            <li>Videogame</li>
+            <li>Pescar </li>
+            <li>Flamengo</li>
+        </ul>
+        <ol>
+            <h3></h3>
+            <li>Curto muito filmes de Ação</li>
+            <li>Gosto de jogar futebol</li>
+            <li>Procuro emprego</li>
+        </ol>
+    </main>
+    <footer> Perfil
+    </footer>
+</body>
+
+</html>
