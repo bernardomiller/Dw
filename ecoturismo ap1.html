@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTour Brasil - Turismo Sustentável</title>
+    <style>
+        /* Resetando margens e padding */
+        body, h1, h2, table, th, td, form, label, input, button {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Estilo básico */
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.5;
+            background-color: #f4f4f4;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            background-color: #4CAF50;
+            color: white;
+            padding: 2rem 0;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        /* Estilos para a tabela responsiva */
+        .table-wrapper {
+            overflow-x: auto;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        /* Estilo do formulário */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            padding: 0.8rem;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        input:invalid {
+            border-color: red;
+        }
+
+        input:valid {
+            border-color: green;
+        }
+
+        button {
+            padding: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+
+        .success-message {
+            color: green;
+            font-size: 1rem;
+        }
+
+        /* Media Queries para Responsividade */
+        @media (max-width: 900px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            table th, table td {
+                padding: 0.8rem;
+            }
+
+            form {
+                padding: 1rem;
+                gap: 0.8rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            table th, table td {
+                padding: 0.6rem;
+            }
+
+            form {
+                padding: 0.8rem;
+                gap: 0.6rem;
+            }
+
+            button {
+                font-size: 0.9rem;
+                padding: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>EcoTour Brasil - Turismo Sustentável</h1>
+    </header>
+
+    <main>
+        <!-- Tabela de Pacotes Turísticos -->
+        <div class="table-wrapper">
+            <table>
+                <caption><h2>Pacotes Turísticos</h2></caption>
+                <thead>
+                    <tr>
+                        <th>Destino</th>
+                        <th>Duração</th>
+                        <th>Preço</th>
+                        <th>Disponibilidade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Floresta Amazônica</td>
+                        <td>7 dias</td>
+                        <td>R$ 3.500,00</td>
+                        <td>Disponível</td>
+                    </tr>
+                    <tr>
+                        <td>Pantanal</td>
+                        <td>5 dias</td>
+                        <td>R$ 2.800,00</td>
+                        <td>Disponível</td>
+                    </tr>
+                    <tr>
+                        <td>Chapada dos Veadeiros</td>
+                        <td>6 dias</td>
+                        <td>R$ 2.200,00</td>
+                        <td>Indisponível</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Formulário de Reserva -->
+        <h2>Faça sua Reserva</h2>
+        <form id="reservaForm" action="#">
+            <label for="nome">Nome Completo</label>
+            <input type="text" id="nome" name="nome" required minlength="3" placeholder="Digite seu nome">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="exemplo@email.com">
+
+            <label for="telefone">Telefone</label>
+            <input type="tel" id="telefone" name="telefone" required pattern="\(\d{2}\) \d{4,5}-\d{4}" placeholder="(XX) XXXXX-XXXX">
+
+            <label for="pacote">Pacote</label>
+            <select id="pacote" name="pacote" required>
+                <option value="">Escolha um pacote</option>
+                <option value="Amazônia">Floresta Amazônica</option>
+                <option value="Pantanal">Pantanal</option>
+                <option value="Chapada">Chapada dos Veadeiros</option>
+            </select>
+
+            <label for="comentarios">Comentários (opcional)</label>
+            <textarea id="comentarios" name="comentarios" rows="4" placeholder="Deixe seus comentários"></textarea>
+
+            <button type="submit">Reservar</button>
+
+            <p id="feedback" class="error-message"></p>
+        </form>
+    </main>
+
+    <script>
+        // Validação do Formulário
+        document.getElementById('reservaForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            let form = event.target;
+            let feedback = document.getElementById('feedback');
+            feedback.textContent = ''; // Limpar mensagem de erro
+
+            // Verificação de campos obrigatórios
+            if (!form.nome.value || !form.email.value || !form.telefone.value || !form.pacote.value) {
+                feedback.textContent = 'Por favor, preencha todos os campos obrigatórios!';
+                return;
+            }
+
+            // Validação de telefone
+            let telefonePattern = /\(\d{2}\) \d{4,5}-\d{4}/;
+            if (!telefonePattern.test(form.telefone.value)) {
+                feedback.textContent = 'Telefone inválido. Use o formato (XX) XXXXX-XXXX';
+                return;
+            }
+
+            // Se tudo estiver ok
+            feedback.textContent = 'Reserva realizada com sucesso!';
+            feedback.classList.remove('error-message');
+            feedback.classList.add('success-message');
+        });
+    </script>
+
+</body>
+</html>
