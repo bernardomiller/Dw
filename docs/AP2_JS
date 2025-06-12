@@ -1,0 +1,708 @@
+// Comentário: Espera o DOM (Document Object Model) carregar completamente antes de executar o script.
+// Isso garante que todos os elementos HTML estejam disponíveis para manipulação pelo JavaScript.
+document.addEventListener('DOMContentLoaded', () => {
+
+    // --- PARTE 1: PEGAR OS ELEMENTOS DO HTML ---
+    // Comentário: Seletores para elementos do menu de navegação
+    const navMenu = document.querySelector('.nav-menu');
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelectorAll('.nav-menu a'); // Todos os links de navegação
+
+    // Comentário: Seletores para as seções principais do site
+    const simulacaoSection = document.getElementById('simulacao-section');
+    const relatorioSection = document.getElementById('relatorio-section');
+    const dadosEconomicosSection = document.getElementById('dados-economicos-section');
+    const investimentosSection = document.getElementById('investimentos-section');
+    const contatoSection = document.getElementById('contato-section');
+
+    // Comentário: Seletores para os elementos do questionário/slides
+    const slidesContainer = document.querySelector('.slides-container');
+    const prevSlideBtn = document.getElementById('prev-btn');
+    const nextSlideBtn = document.getElementById('next-btn');
+    const finishBtn = document.getElementById('finish-btn'); // Botão para finalizar o questionário
+
+    // Comentário: Seletores para o relatório e gráficos
+    const profileSummary = document.getElementById('profile-summary');
+    const profileChartCtx = document.getElementById('profileChart').getContext('2d'); // Contexto 2D para o gráfico de perfil
+    const projectionChartCtx = document.getElementById('projectionChart').getContext('2d'); // Contexto 2D para o gráfico de projeção
+
+    // Comentário: Seletores para as tabelas de dados de API
+    const economicDataTable = document.getElementById('economic-data-table');
+    const investmentDataTable = document.getElementById('investment-data-table');
+
+    // Comentário: Seletores para o formulário de contato
+    const contactForm = document.getElementById('contact-form');
+    const nomeContatoInput = document.getElementById('nome-contato');
+    const emailContatoInput = document.getElementById('email-contato');
+    const mensagemContatoInput = document.getElementById('mensagem-contato');
+
+    // Comentário: Variáveis de estado do questionário e gráficos
+    let currentSlideIndex = 0; // Índice do slide atualmente visível
+    let userAnswers = {}; // Objeto para armazenar as respostas do usuário
+    let profileChart = null; // Instância do Chart.js para o gráfico de perfil
+    let projectionChart = null; // Instância do Chart.js para o gráfico de projeção
+
+
+    // Comentário: Definição das perguntas do questionário de perfil
+    const questions = [
+        {
+            id: 'q1',
+            question: 'Qual o seu nome?',
+            type: 'text',
+            name: 'nome', // ID do campo nome (no HTML é 'nome-contato' mas para este slide é 'nome')
+            placeholder: 'Digite apenas seu nome'
+        },
+        {
+            id: 'q2',
+            question: 'Qual o seu capital para investir? (R$)',
+            type: 'number',
+            name: 'capital',
+            placeholder: 'Ex: 5000',
+            min: 0
+        },
+        {
+            id: 'q3',
+            question: 'Por quanto tempo pretende investir?',
+            type: 'select',
+            name: 'tempo',
+            options: [
+                { value: '', text: 'Selecione um período', disabled: true, selected: true },
+                { value: '1', text: 'Até 1 ano' },
+                { value: '5', text: 'De 1 a 5 anos' },
+                { value: '10', text: 'Mais de 5 anos' }
+            ]
+        },
+        {
+            id: 'q4',
+            question: 'Qual seu principal objetivo?',
+            type: 'radio',
+            name: 'objetivo',
+            options: [
+                { value: 'Preservar Capital', text: 'Apenas preservar meu capital da inflação.' },
+                { value: 'Crescimento Moderado', text: 'Obter um crescimento moderado e consistente.' },
+                { value: 'Aposentadoria', text: 'Construir patrimônio para a aposentadoria.' }
+            ]
+        },
+        {
+            id: 'q5',
+            question: 'Qual seu perfil de risco?',
+            type: 'radio',
+            name: 'risco',
+            options: [
+                { value: 'Conservador', text: 'Conservador (Prefiro máxima segurança)' },
+                { value: 'Moderado', text: 'Moderado (Aceito um pouco de risco)' },
+                { value: 'Arrojado', text: 'Arrojado (Busco altos retornos)' }
+            ]
+        }
+    ];
+
+    // --- PARTE 2: FUNÇÕES DE NAVEGAÇÃO E EXIBIÇÃO ---
+
+    // Comentário: Função para exibir uma seção e esconder as outras.
+    function showSection(sectionToShow) {
+        // Esconde todas as seções principais
+        simulacaoSection.style.display = 'none';
+        relatorioSection.style.display = 'none';
+        dadosEconomicosSection.style.display = 'none';
+        investimentosSection.style.display = 'none';
+        contatoSection.style.display = 'none';
+
+        // Exibe a seção desejada
+        sectionToShow.style.display = 'block';
+
+        // Garante que o menu mobile esteja fechado após a navegação
+        navMenu.classList.remove('active');
+    }
+
+    // Comentário: Função para renderizar o slide atual do questionário.
+    // Constrói o HTML do slide dinamicamente com base no objeto `questions`.
+    function renderSlides() {
+        slidesContainer.innerHTML = ''; // Limpa o conteúdo anterior
+        const q = questions[currentSlideIndex];
+
+        const slide = document.createElement('div');
+        slide.classList.add('slide', 'active'); // O slide atual sempre começa como 'active'
+
+        // Título do slide com a contagem da pergunta
+        let contentHtml = `<h3>Pergunta ${currentSlideIndex + 1} de ${questions.length}: ${q.question}</h3>`;
+
+        // Lógica para renderizar diferentes tipos de inputs (text, number, select, radio)
+        if (q.type === 'text' || q.type === 'number') {
+            // Usa 'nome' para o primeiro slide e 'capital' para o segundo
+            const inputId = q.id === 'q1' ? 'nome' : q.id === 'q2' ? 'capital' : q.name;
+            const errorId = `${inputId}-error`;
+
+            contentHtml += `
+                <div class="form-group">
+                    <label for="${inputId}">${q.question}</label>
+                    <input type="${q.type}" id="${inputId}" name="${q.name}" placeholder="${q.placeholder}" 
+                           value="${userAnswers[q.id] || ''}" ${q.min !== undefined ? `min="${q.min}"` : ''} required>
+                    <small class="error-message" id="${errorId}"></small>
+                </div>
+            `;
+        } else if (q.type === 'select') {
+            let optionsHtml = q.options.map(option => `
+                <option value="${option.value}" ${option.disabled ? 'disabled' : ''} ${option.selected ? 'selected' : ''} 
+                        ${userAnswers[q.id] === option.value ? 'selected' : ''}>
+                    ${option.text}
+                </option>
+            `).join('');
+            contentHtml += `
+                <div class="form-group">
+                    <label for="${q.name}">${q.question}</label>
+                    <select id="${q.name}" name="${q.name}" required>
+                        ${optionsHtml}
+                    </select>
+                    <small class="error-message" id="${q.name}-error"></small>
+                </div>
+            `;
+        } else if (q.type === 'radio') {
+            let optionsHtml = q.options.map(option => `
+                <label>
+                    <input type="radio" name="${q.name}" value="${option.value}" 
+                           ${userAnswers[q.id] === option.value ? 'checked' : ''} required>
+                    ${option.text}
+                </label>
+            `).join('');
+            contentHtml += `
+                <div class="form-group">
+                    <label>${q.question}</label>
+                    <div class="options-vertical">
+                        ${optionsHtml}
+                    </div>
+                    <small class="error-message" id="${q.name}-error"></small>
+                </div>
+            `;
+        }
+
+        slide.innerHTML = contentHtml;
+        slidesContainer.appendChild(slide);
+
+        // Comentário: Adiciona event listeners para salvar as respostas e validar inputs.
+        const inputElement = slide.querySelector(`[name="${q.name}"]`);
+        if (inputElement) {
+            if (q.type === 'radio' || q.type === 'select') {
+                inputElement.addEventListener('change', (event) => {
+                    userAnswers[q.id] = event.target.value;
+                    updateNavigationButtons();
+                });
+            } else { // Para inputs de texto ou número
+                // Comentário: Adiciona event listener no blur para inputs de texto/número
+                inputElement.addEventListener('blur', (event) => {
+                    if (q.id === 'q1') validateName(event.target);
+                    else if (q.id === 'q2') validateCapital(event.target);
+                    userAnswers[q.id] = event.target.value; // Salva o valor no blur também
+                    updateNavigationButtons();
+                });
+                // Comentário: Adiciona event listener no input para validação contínua
+                inputElement.addEventListener('input', (event) => {
+                    if (q.id === 'q1') validateName(event.target);
+                    else if (q.id === 'q2') validateCapital(event.target);
+                    userAnswers[q.id] = event.target.value;
+                    updateNavigationButtons();
+                });
+            }
+        }
+        updateNavigationButtons(); // Atualiza o estado dos botões após renderizar
+    }
+
+    // Comentário: Função para verificar se o slide atual foi respondido corretamente.
+    function isCurrentSlideAnswered() {
+        const q = questions[currentSlideIndex];
+        const inputElement = slidesContainer.querySelector(`[name="${q.name}"]`);
+
+        if (!inputElement) return false; // Se o elemento não existe (erro de HTML/JS)
+
+        if (q.type === 'text') {
+            return validateName(inputElement);
+        } else if (q.type === 'number') {
+            return validateCapital(inputElement);
+        } else if (q.type === 'select') {
+            return inputElement.value !== '';
+        } else if (q.type === 'radio') {
+            const selectedRadio = slidesContainer.querySelector(`input[name="${q.name}"]:checked`);
+            return selectedRadio !== null;
+        }
+        return false;
+    }
+
+
+    // Comentário: Função para atualizar a visibilidade e estado (`disabled`) dos botões de navegação dos slides.
+    function updateNavigationButtons() {
+        prevSlideBtn.disabled = currentSlideIndex === 0; // Desabilita 'Anterior' no primeiro slide
+
+        // O botão 'Próximo' só é habilitado se a pergunta atual foi respondida E validada
+        nextSlideBtn.disabled = !isCurrentSlideAnswered();
+
+        // Lógica para o botão 'Finalizar'
+        if (currentSlideIndex === questions.length - 1) {
+            nextSlideBtn.style.display = 'none'; // Esconde 'Próximo'
+            finishBtn.style.display = 'block'; // Exibe 'Finalizar'
+            // O botão 'Finalizar' só é habilitado se a última pergunta for respondida
+            finishBtn.disabled = !isCurrentSlideAnswered();
+        } else {
+            nextSlideBtn.style.display = 'inline-block'; // Exibe 'Próximo'
+            finishBtn.style.display = 'none'; // Esconde 'Finalizar'
+        }
+    }
+
+    // Comentário: Função para avançar para o próximo slide.
+    function nextSlide() {
+        // Validação específica para o campo de nome no primeiro slide
+        if (currentSlideIndex === 0 && !validateName(slidesContainer.querySelector('[name="nome"]'))) {
+            return;
+        }
+        // Validação específica para o campo de capital no segundo slide
+        if (currentSlideIndex === 1 && !validateCapital(slidesContainer.querySelector('[name="capital"]'))) {
+            return;
+        }
+
+        if (currentSlideIndex < questions.length - 1) {
+            currentSlideIndex++;
+            renderSlides();
+        }
+    }
+
+    // Comentário: Função para voltar para o slide anterior.
+    function prevSlide() {
+        if (currentSlideIndex > 0) {
+            currentSlideIndex--;
+            renderSlides();
+        }
+    }
+
+
+    // --- PARTE 3: LÓGICA DA SIMULAÇÃO E RELATÓRIO FINAL ---
+
+    // Comentário: Função para calcular a projeção de juros compostos.
+    function calculateProjection(profile, initialCapital, investmentYears) {
+        // Define taxas de juros anuais hipotéticas baseadas no perfil de risco.
+        // Convertidas para decimal (ex: 8% = 0.08)
+        const annualRates = {
+            'Conservador': 0.05, // 5% ao ano
+            'Moderado': 0.08,    // 8% ao ano
+            'Arrojado': 0.12     // 12% ao ano
+        };
+
+        const annualRate = annualRates[profile] || 0.00; // Garante uma taxa, mesmo que o perfil não seja encontrado
+        const monthlyRate = Math.pow(1 + annualRate, 1 / 12) - 1; // Converte a taxa anual para mensal.
+
+        let total = initialCapital;
+        let annualValues = [initialCapital]; // Armazena o valor inicial (Ano 0)
+
+        // Simula o crescimento do dinheiro mês a mês.
+        for (let year = 1; year <= investmentYears; year++) {
+            // Calcula o valor ao final do ano
+            for (let month = 1; month <= 12; month++) {
+                total *= (1 + monthlyRate);
+            }
+            annualValues.push(total); // Adiciona o valor ao final de cada ano
+        }
+
+        return {
+            finalValue: total,
+            annualValues: annualValues
+        };
+    }
+
+    // Comentário: Lógica para gerar o relatório de perfil de investimento com base nas respostas.
+    function generateReport() {
+        showSection(relatorioSection); // Exibe a seção de relatório
+
+        // Coleta de TODOS os dados do formulário (incluindo nome e capital dos primeiros slides).
+        const nome = userAnswers['q1'] || 'Visitante';
+        const capital = parseFloat(userAnswers['q2']) || 0;
+        const tempo = parseInt(userAnswers['q3']) || 0;
+        const objetivo = userAnswers['q4'];
+        const risco = userAnswers['q5'];
+
+        let profile = '';
+        let profileDescription = '';
+        let profileAllocation = {};
+
+        // Lógica para determinar o perfil e sugestão de alocação
+        if (risco === 'Conservador') {
+            profile = 'Conservador';
+            profileDescription = `Olá, <strong>${nome}</strong>! Com base em suas respostas, você demonstra um perfil <strong>Conservador</strong>. Você busca segurança e estabilidade, priorizando a preservação do capital. Investimentos de baixo risco e previsibilidade são ideais para você.`;
+            profileAllocation = { 'Renda Fixa': 70, 'Fundos Multimercado (Conservador)': 20, 'Ações (Baixa Volatilidade)': 10 };
+        } else if (risco === 'Moderado') {
+            profile = 'Moderado';
+            profileDescription = `Olá, <strong>${nome}</strong>! Seu perfil é <strong>Moderado</strong>. Você busca um equilíbrio entre segurança e rentabilidade, aceitando riscos controlados para retornos mais significativos.`;
+            profileAllocation = { 'Renda Fixa': 40, 'Fundos Multimercado (Moderado)': 30, 'Ações (Médio Risco)': 20, 'Criptomoedas (Pequena Exposição)': 10 };
+        } else if (risco === 'Arrojado') {
+            profile = 'Arrojado';
+            profileDescription = `Olá, <strong>${nome}</strong>! Você tem um perfil <strong>Arrojado</strong>. Possui alta tolerância a riscos e busca maximizar os retornos, entendendo as volatilidades do mercado.`;
+            profileAllocation = { 'Ações (Alto Risco)': 50, 'Criptomoedas': 30, 'Fundos Multimercado (Arrojado)': 15, 'Renda Fixa (Pequena Exposição)': 5 };
+        } else {
+            profile = 'Não Definido';
+            profileDescription = 'Não foi possível determinar seu perfil com as respostas fornecidas.';
+            profileAllocation = { 'Ações': 33, 'Renda Fixa': 33, 'Criptomoedas': 34 };
+        }
+
+        // Realiza a projeção financeira
+        const { finalValue, annualValues } = calculateProjection(profile, capital, tempo);
+
+        // Exibe o resumo do perfil na interface
+        profileSummary.innerHTML = `
+            <p><strong>Seu Perfil de Investidor:</strong> <span>${profile}</span></p>
+            <p>${profileDescription}</p>
+            <p>Com um capital inicial de <strong>R$ ${capital.toLocaleString('pt-BR')}</strong> e objetivo de <strong>${objetivo}</strong> por <strong>${tempo}</strong> ano(s).</p>
+            <p>Sua projeção de patrimônio ao final do período é de: <strong>${finalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></p>
+            <h4>Sugestão de Alocação de Ativos:</h4>
+            <ul>
+                ${Object.entries(profileAllocation).map(([asset, percentage]) => `<li>${asset}: ${percentage}%</li>`).join('')}
+            </ul>
+        `;
+
+        // Renderiza os gráficos
+        renderProfileChart(profileAllocation);
+        renderProjectionChart(annualValues, tempo);
+
+        // Rola a página para mostrar o resultado.
+        relatorioSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Comentário: Função para renderizar o gráfico de perfil de investimento (pizza) usando Chart.js.
+    function renderProfileChart(allocation) {
+        if (profileChart) {
+            profileChart.destroy(); // Destroi a instância anterior do gráfico para evitar duplicatas
+        }
+
+        const labels = Object.keys(allocation);
+        const data = Object.values(allocation);
+        // Cores do gráfico atualizadas para tons de verde e complementares.
+        const colors = [
+            'rgba(10, 106, 35, 0.8)',   // Primary Green
+            'rgba(60, 179, 113, 0.8)',  // Secondary Green
+            'rgba(40, 167, 69, 0.8)',   // Accent Green
+            'rgba(144, 238, 144, 0.8)', // Light Green
+            'rgba(85, 107, 47, 0.8)',   // Dark Olive Green
+            'rgba(108, 117, 125, 0.8)'  // Cinza (para contrastar, se houver muitos itens)
+        ];
+
+        profileChart = new Chart(profileChartCtx, {
+            type: 'pie', // Tipo de gráfico: pizza
+            data: {
+                labels: labels, // Rótulos para cada fatia do gráfico
+                datasets: [{
+                    data: data, // Valores para cada fatia
+                    backgroundColor: colors.slice(0, labels.length), // Cores para as fatias
+                    hoverOffset: 4 // Deslocamento ao passar o mouse
+                }]
+            },
+            options: {
+                responsive: true, // Gráfico responsivo
+                plugins: {
+                    legend: {
+                        position: 'top', // Posição da legenda
+                    },
+                    title: {
+                        display: true,
+                        text: 'Alocação Sugerida por Tipo de Ativo' // Título do gráfico
+                    }
+                }
+            }
+        });
+    }
+
+    // Comentário: Função para criar o gráfico de linha da projeção de patrimônio.
+    function renderProjectionChart(data, years) {
+        if (projectionChart) {
+            projectionChart.destroy(); // Destrói o gráfico anterior para não haver sobreposição.
+        }
+        // Cria os rótulos do eixo X (ex: "Ano 0", "Ano 1", ...).
+        const labelsYears = Array.from({ length: years + 1 }, (_, i) => `Ano ${i}`);
+
+        projectionChart = new Chart(projectionChartCtx, {
+            type: 'line', // Define o tipo do gráfico como linha.
+            data: {
+                labels: labelsYears,
+                datasets: [{
+                    label: 'Crescimento do Patrimônio (R$)',
+                    data: data, // Usa os dados calculados.
+                    borderColor: 'rgba(10, 106, 35, 1)', // Cor primária (verde escuro)
+                    backgroundColor: 'rgba(60, 179, 113, 0.2)', // Cor secundária com transparência
+                    fill: true, // Preenche a área abaixo da linha.
+                    tension: 0.2, // Deixa a linha levemente curvada.
+                    pointBackgroundColor: 'rgba(10, 106, 35, 1)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgba(10, 106, 35, 1)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Patrimônio (R$)'
+                        },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Anos'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // --- PARTE 4: BUSCA DE DADOS DA API E CONSTRUÇÃO DE TABELAS ---
+
+    // Comentário: Função que busca dados na API e cria a tabela de Dados Econômicos.
+    async function fetchEconomicData() {
+        economicDataTable.innerHTML = '<p>Carregando dados econômicos...</p>';
+        try {
+            // Buscar moedas e criptomoedas conforme a inspiração
+            const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,GBP-BRL,CAD-BRL');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+
+            let tableHTML = `
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Moeda</th>
+                            <th>Nome Completo</th>
+                            <th>Valor Compra (BRL)</th>
+                            <th>Variação (%)</th>
+                            <th>Última Atualização</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            for (const key in data) {
+                const asset = data[key];
+                // Remover o multiplicador de BTC se não for necessário para a unidade real
+                // O .replace('/Real Brasileiro', '') remove o sufixo redundante
+                tableHTML += `
+                    <tr>
+                        <td>${asset.code}</td>
+                        <td>${asset.name.replace('/Real Brasileiro', '').trim()}</td>
+                        <td>R$ ${parseFloat(asset.bid).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 })}</td>
+                        <td style="color: ${parseFloat(asset.pctChange) >= 0 ? 'green' : 'red'};">
+                            ${parseFloat(asset.pctChange).toFixed(2)}%
+                        </td>
+                        <td>${new Date(asset.timestamp * 1000).toLocaleString('pt-BR')}</td>
+                    </tr>
+                `;
+            }
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+            economicDataTable.innerHTML = tableHTML;
+        } catch (error) {
+            console.error('Erro ao buscar dados econômicos:', error);
+            economicDataTable.innerHTML = '<p class="error-message">Erro ao carregar dados econômicos. Tente novamente mais tarde.</p>';
+        }
+    }
+
+    // Comentário: Função que cria uma tabela estática para a seção de Investimentos (inspirada no exemplo).
+    function fetchInvestmentData() {
+        const container = document.getElementById('investment-data-table');
+        const investments = [
+            { nome: 'Renda Fixa (Tesouro Selic)', risco: 'Baixo', descricao: 'Seu rendimento acompanha a taxa básica de juros (Selic), ideal para segurança.' },
+            { nome: 'Fundos Imobiliários (FIIs)', risco: 'Médio', descricao: 'Permite investir em imóveis e receber aluguéis mensais, com volatilidade moderada.' },
+            { nome: 'Ações (Ibovespa)', risco: 'Alto', descricao: 'Compra de partes de grandes empresas, com potencial de alto retorno e maior risco.' },
+            { nome: 'Criptomoedas (Bitcoin)', risco: 'Muito Alto', descricao: 'Ativos digitais com potencial de valorização expressivo e risco elevado devido à alta volatilidade.' },
+            { nome: 'Fundos Multimercado', risco: 'Variável', descricao: 'Investe em diversas classes de ativos, buscando diversificação e flexibilidade.' }
+        ];
+        let tableBodyHTML = '';
+        investments.forEach(inv => {
+            tableBodyHTML += `
+                <tr>
+                    <td>${inv.nome}</td>
+                    <td>${inv.risco}</td>
+                    <td>${inv.descricao}</td>
+                </tr>
+            `;
+        });
+        container.innerHTML = `
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Tipo de Investimento</th>
+                        <th>Nível de Risco</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableBodyHTML}
+                </tbody>
+            </table>
+        `;
+    }
+
+    // --- PARTE 5: VALIDAÇÃO DE FORMULÁRIOS ---
+
+    // Comentário: Função para exibir mensagem de erro em um elemento <small>
+    function displayError(elementId, message) {
+        const errorMessageElement = document.getElementById(elementId);
+        if (errorMessageElement) {
+            errorMessageElement.textContent = message;
+        }
+    }
+
+    // Comentário: Função para limpar mensagem de erro
+    function clearError(elementId) {
+        const errorMessageElement = document.getElementById(elementId);
+        if (errorMessageElement) {
+            errorMessageElement.textContent = '';
+        }
+    }
+
+    // Comentário: Validação para o campo de nome (apenas letras e espaços)
+    function validateName(input) {
+        const nameRegex = /^[a-zA-Z\sÀ-ú]+$/; // Permite letras (incluindo acentuadas) e espaços
+        const errorId = input.id === 'nome' ? 'nome-error' : 'nome-contato-error'; // Ajusta o ID do erro
+        if (input.value.trim() === '') {
+            displayError(errorId, 'O nome não pode ser vazio.');
+            return false;
+        } else if (!nameRegex.test(input.value)) {
+            displayError(errorId, 'O nome deve conter apenas letras e espaços.');
+            return false;
+        } else {
+            clearError(errorId);
+            return true;
+        }
+    }
+
+    // Comentário: Validação para o campo de email
+    function validateEmail(input) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (input.value.trim() === '') {
+            displayError('email-contato-error', 'O email não pode ser vazio.');
+            return false;
+        } else if (!emailRegex.test(input.value)) {
+            displayError('email-contato-error', 'Por favor, insira um email válido.');
+            return false;
+        } else {
+            clearError('email-contato-error');
+            return true;
+        }
+    }
+
+    // Comentário: Validação para o campo de mensagem (não pode ser vazio)
+    function validateMessage(input) {
+        if (input.value.trim() === '') {
+            displayError('mensagem-contato-error', 'A mensagem não pode ser vazia.');
+            return false;
+        } else {
+            clearError('mensagem-contato-error');
+            return true;
+        }
+    }
+
+    // Comentário: Validação para o campo de capital (apenas números positivos)
+    function validateCapital(input) {
+        const capitalValue = parseFloat(input.value);
+        if (input.value.trim() === '') {
+            displayError('capital-error', 'O capital não pode ser vazio.');
+            return false;
+        } else if (isNaN(capitalValue) || capitalValue <= 0) {
+            displayError('capital-error', 'Por favor, insira um valor numérico positivo.');
+            return false;
+        } else {
+            clearError('capital-error');
+            return true;
+        }
+    }
+
+
+    // --- PARTE 6: EVENT LISTENERS E INICIALIZAÇÃO ---
+
+    // Comentário: Event listener para o botão de toggle do menu mobile.
+    // Alterna a classe 'active' no navMenu para exibir/esconder o menu.
+    menuToggle.addEventListener('click', () => {
+        navMenu.classList.toggle('active');
+    });
+
+    // Comentário: Event listeners para os links de navegação.
+    // Cada link chama `showSection` para exibir a seção correspondente.
+    navLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+            event.preventDefault(); // Impede o comportamento padrão do link (rolar para a âncora)
+            const targetId = link.getAttribute('href').substring(1); // Pega o ID da seção (ex: 'simulacao-section')
+            const targetSection = document.getElementById(targetId);
+
+            if (targetSection) {
+                showSection(targetSection); // Mostra a seção clicada
+                // Recarrega dados ou reseta slides conforme a seção
+                if (targetId === 'simulacao-section') {
+                    currentSlideIndex = 0; // Reseta o questionário
+                    renderSlides();
+                } else if (targetId === 'dados-economicos-section') {
+                    fetchEconomicData(); // Busca dados econômicos
+                } else if (targetId === 'investimentos-section') {
+                    fetchInvestmentData(); // Busca dados de investimentos (estático)
+                }
+            }
+        });
+    });
+
+    // Comentário: Event listeners para os botões de navegação dos slides.
+    prevSlideBtn.addEventListener('click', prevSlide);
+    nextSlideBtn.addEventListener('click', nextSlide);
+    finishBtn.addEventListener('click', generateReport); // Botão "Finalizar" chama `generateReport`
+
+    // Comentário: Event listener para submissão do formulário de contato.
+    // Realiza a validação dos campos antes de "enviar" o formulário.
+    contactForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Impede o envio padrão do formulário (recarregar a página)
+
+        // Comentário: Valida todos os campos do formulário de contato
+        const isNameValid = validateName(nomeContatoInput);
+        const isEmailValid = validateEmail(emailContatoInput);
+        const isMessageValid = validateMessage(mensagemContatoInput);
+
+        if (isNameValid && isEmailValid && isMessageValid) {
+            alert('Formulário enviado com sucesso! Entraremos em contato em breve.');
+            contactForm.reset(); // Limpa o formulário após o "envio"
+        } else {
+            alert('Por favor, corrija os erros no formulário antes de enviar.');
+        }
+    });
+
+    // Comentário: Adiciona validação em tempo real ao sair dos campos de contato
+    nomeContatoInput.addEventListener('blur', (event) => validateName(event.target));
+    emailContatoInput.addEventListener('blur', (event) => validateEmail(event.target));
+    mensagemContatoInput.addEventListener('blur', (event) => validateMessage(event.target));
+
+
+    // --- Inicialização da Aplicação ---
+
+    // Comentário: Exibe a seção de simulação (questionário) por padrão ao carregar a página.
+    showSection(simulacaoSection);
+    // Comentário: Renderiza o primeiro slide do questionário.
+    renderSlides();
+    // Comentário: Busca os dados econômicos e de investimento da API ao iniciar para que já estejam carregados.
+    fetchEconomicData();
+    fetchInvestmentData();
+});
