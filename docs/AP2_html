@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!-- Define o tipo de documento como HTML5, a versão mais recente do HTML. -->
+<html lang="pt-BR">
+<!-- A tag raiz do documento. O atributo 'lang' especifica que o idioma da página é o português do Brasil. -->
+
+<head>
+    <!-- Contém metadados, links para folhas de estilo e scripts, que não são visíveis na página. -->
+    <meta charset="UTF-8">
+    <!-- Define o conjunto de caracteres como UTF-8, que suporta a maioria dos caracteres e símbolos. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Uma tag crucial para o design responsivo. Garante que a página se ajuste à largura da tela do dispositivo. -->
+    <title>Investexpert - Seu Guia de Investimentos</title>
+    <!-- O título que aparece na aba do navegador. -->
+
+    <!-- --- IMPORTAÇÃO DE FONTES E ÍCONES EXTERNOS --- -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@600;700&display=swap"
+        rel="stylesheet">
+    <!-- Importa as fontes 'Lato' e 'Poppins' do Google Fonts para serem usadas no CSS. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Importa a biblioteca Font Awesome para ícones. -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Importa a biblioteca Chart.js, que será usada pelo JavaScript para criar os gráficos. -->
+
+    <!-- --- VÍNCULO COM ARQUIVOS LOCAIS --- -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Link para a sua folha de estilos CSS, que define toda a aparência da página. -->
+    <script src="js/script.js" defer></script>
+    <!-- Link para o seu arquivo JavaScript. O atributo 'defer' garante que o script só seja executado após o HTML ser totalmente carregado. -->
+</head>
+
+<body>
+    <!-- O corpo do documento, onde todo o conteúdo visível da página é colocado. -->
+
+    <!-- --- CABEÇALHO DA PÁGINA --- -->
+    <header>
+        <div class="container header-content">
+            <!-- O container ajuda a centralizar o conteúdo. -->
+            <h1><i class="fa-solid fa-chart-line"></i> Investexpert</h1>
+            <!-- O título principal do site com um ícone do Font Awesome. -->
+            <nav>
+                <!-- A tag de navegação, que agrupa os links principais do site. -->
+                <button class="menu-toggle" aria-label="Abrir menu"><i class="fas fa-bars"></i></button>
+                <!-- Botão para o menu responsivo em telas menores. -->
+                <ul class="nav-menu">
+                    <!-- Lista de links para as seções do site. -->
+                    <li><a href="#simulacao-section" id="link-simulador">Simulação</a></li>
+                    <li><a href="#dados-economicos-section" id="link-dados">Dados Econômicos</a></li>
+                    <li><a href="#investimentos-section" id="link-investimentos">Investimentos</a></li>
+                    <li><a href="#contato-section" id="link-contato">Contato</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- --- CONTEÚDO PRINCIPAL DA PÁGINA --- -->
+    <main class="container">
+
+        <!-- --- SEÇÃO DO QUESTIONÁRIO (SLIDES) --- -->
+        <!-- Esta é a primeira seção visível para o usuário ao carregar a página. -->
+        <section id="simulacao-section">
+            <h2>Descubra seu Perfil de Investidor</h2>
+            <p>Responda às perguntas para ver seu relatório e sugestões de investimento.</p>
+
+            <div class="slides-container">
+                <!-- Este container será preenchido dinamicamente com os slides do questionário pelo JavaScript. -->
+            </div>
+
+            <div class="slide-navigation">
+                <!-- Contém os botões para navegar entre os slides do questionário. -->
+                <button id="prev-btn" disabled>Anterior</button>
+                <button id="next-btn">Próximo</button>
+                <button id="finish-btn" style="display:none;">Ver Relatório</button>
+            </div>
+        </section>
+
+        <!-- --- SEÇÃO DO RELATÓRIO --- -->
+        <!-- Esta seção começa oculta e só aparece após o usuário finalizar o questionário. -->
+        <section id="relatorio-section" style="display: none;">
+            <h2><i class="fa-solid fa-file-invoice"></i> Seu Relatório de Perfil</h2>
+            <div id="profile-summary"></div>
+            <!-- Este 'div' vazio será preenchido pelo JavaScript com o texto personalizado do relatório. -->
+
+            <div class="chart-container">
+                <h3>Sugestão de Alocação de Ativos</h3>
+                <canvas id="profileChart"></canvas>
+                <!-- O elemento 'canvas' é uma área de desenho onde o JavaScript (com Chart.js) criará o gráfico de alocação. -->
+            </div>
+
+            <div class="chart-container">
+                <h3>Projeção de Crescimento do Patrimônio</h3>
+                <canvas id="projectionChart"></canvas>
+                <!-- Novo elemento canvas para o gráfico de projeção financeira. -->
+            </div>
+        </section>
+
+        <!-- --- SEÇÃO DE DADOS ECONÔMICOS --- -->
+        <!-- Esta seção começa oculta e é exibida quando o usuário clica no link de navegação. -->
+        <section id="dados-economicos-section" style="display: none;">
+            <h2><i class="fa-solid fa-table-list"></i> Dados Econômicos Relevantes</h2>
+            <p>Tabela com as cotações principais e índices econômicos do mercado.</p>
+            <div id="economic-data-table">
+                <!-- Este 'div' vazio será preenchido pelo JavaScript com uma tabela de dados buscados na API. -->
+                <p>Carregando dados econômicos...</p>
+            </div>
+        </section>
+
+        <!-- --- SEÇÃO DE INVESTIMENTOS --- -->
+        <!-- Esta seção também começa oculta e é exibida quando o usuário clica no link de navegação. -->
+        <section id="investimentos-section" style="display: none;">
+            <h2><i class="fa-solid fa-seedling"></i> Comparativo de Investimentos</h2>
+            <p>Veja as cotações em tempo real de alguns ativos de investimento e descrições.</p>
+            <div id="investment-data-table">
+                <!-- Este 'div' vazio será preenchido pelo JavaScript com uma tabela de informações sobre investimentos. -->
+                <p>Carregando dados de investimentos...</p>
+            </div>
+        </section>
+
+        <!-- Formulário de Contato -->
+        <section id="contato-section" style="display: none;">
+            <h2><i class="fa-solid fa-envelope"></i> Entre em Contato</h2>
+            <form id="contact-form">
+                <div class="form-group">
+                    <label for="nome-contato">Nome:</label>
+                    <input type="text" id="nome-contato" name="nome-contato" placeholder="Seu nome completo" required>
+                    <small class="error-message" id="nome-contato-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="email-contato">Email:</label>
+                    <input type="email" id="email-contato" name="email-contato" placeholder="seu.email@example.com" required>
+                    <small class="error-message" id="email-contato-error"></small>
+                </div>
+                <div class="form-group">
+                    <label for="mensagem-contato">Mensagem:</label>
+                    <textarea id="mensagem-contato" name="mensagem-contato" rows="5" placeholder="Sua mensagem aqui..." required></textarea>
+                    <small class="error-message" id="mensagem-contato-error"></small>
+                </div>
+                <button type="submit" class="btn-submit">Enviar Mensagem</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- --- RODAPÉ DA PÁGINA --- -->
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section about">
+                <h3>Sobre o Investexpert</h3>
+                <p>Uma ferramenta desenvolvida para auxiliar você na tomada de decisão de investimentos, adaptada ao seu perfil.</p>
+            </div>
+            <div class="footer-section links">
+                <h3>Links Úteis</h3>
+                <ul>
+                    <li><a href="#simulacao-section">Simulação de Perfil</a></li>
+                    <li><a href="#dados-economicos-section">Dados Econômicos</a></li>
+                    <li><a href="#investimentos-section">Comparativo de Investimentos</a></li>
+                    <li><a href="#contato-section">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-section social">
+                <h3>Redes Sociais</h3>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>&copy; 2025 Investexpert. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+</body>
+
+</html>
