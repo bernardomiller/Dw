@@ -1,0 +1,527 @@
+/* Variáveis CSS para consistência e fácil manutenção */
+:root {
+    /* Paleta de Cores em Verde */
+    --primary-color: #0A6A23; /* Verde escuro principal, para cabeçalhos e elementos primários */
+    --secondary-color: #3CB371; /* Verde médio, para botões e links secundários */
+    --accent-color: #4CAF50; /* Verde de destaque, para elementos interativos e de sucesso */
+    --bg-color: #F8F8F8; /* Fundo principal claro (quase branco) */
+    --text-color: #333; /* Cor padrão do texto */
+    --light-text-color: #fff; /* Cor do texto claro (para fundos escuros) */
+    --border-color: #E0E0E0; /* Cor da borda suave */
+    --title-color-dark: #0A6A23; /* Cor para títulos em seções claras */
+    --dark-bg: #074D1B; /* Cor de fundo escura para o rodapé */
+
+    /* Fontes */
+    --font-primary: 'Poppins', sans-serif; /* Fonte para títulos */
+    --font-secondary: 'Lato', sans-serif; /* Fonte para o corpo do texto */
+
+    /* Ponto de quebra para responsividade */
+    --mobile-breakpoint: 768px;
+}
+
+/* Reset Básico para remover estilos padrão do navegador */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Garante que padding e borda sejam incluídos na largura/altura */
+}
+
+body {
+    font-family: var(--font-secondary);
+    background-color: var(--bg-color); /* Fundo principal claro */
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Garante que o rodapé fique no final da página */
+}
+
+/* Estilo para centralizar e limitar a largura do conteúdo */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estilo para links padrão */
+a {
+    color: var(--secondary-color); /* Links usam verde secundário */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--primary-color); /* Links em hover usam verde primário */
+    text-decoration: underline;
+}
+
+/* Estilo para títulos (seções e dentro das seções) */
+h1, h2, h3 {
+    font-family: var(--font-primary);
+    color: var(--title-color-dark); /* Títulos usam verde escuro */
+    margin-bottom: 1rem;
+}
+
+/* Estilo específico para o título do cabeçalho */
+header h1 {
+    color: var(--light-text-color); /* Título no cabeçalho é branco */
+    font-size: 1.8em; /* Ajuste para mobile */
+    margin: 0;
+}
+
+header h1 .fa-chart-line {
+    margin-right: 10px; /* Espaçamento entre o ícone e o texto */
+}
+
+/* --- HEADER --- */
+header {
+    background-color: var(--primary-color); /* Cabeçalho usa verde primário */
+    color: var(--light-text-color);
+    padding: 1rem 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky; /* Fixa o cabeçalho no topo */
+    top: 0;
+    z-index: 1000;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* Permite que os itens quebrem linha em telas pequenas */
+}
+
+/* Botão de menu para mobile */
+.menu-toggle {
+    background: none;
+    border: none;
+    color: var(--light-text-color);
+    font-size: 1.8em;
+    cursor: pointer;
+    display: block; /* Visível por padrão em mobile */
+}
+
+/* Menu de navegação */
+.nav-menu {
+    list-style: none;
+    display: none; /* Escondido por padrão em mobile */
+    width: 100%; /* Ocupa toda a largura em mobile quando visível */
+    flex-direction: column; /* Itens em coluna em mobile */
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.2); /* Fundo semi-transparente para o menu aberto */
+    border-radius: 5px;
+}
+
+.nav-menu.active {
+    display: flex; /* Exibe o menu quando a classe 'active' é adicionada pelo JS */
+}
+
+.nav-menu li {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.nav-menu a {
+    color: var(--light-text-color);
+    padding: 0.8em 1.2em;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-menu a:hover {
+    background-color: var(--accent-color); /* Link em hover usa verde de destaque */
+    color: var(--primary-color); /* Texto do link em hover usa verde primário */
+    text-decoration: none;
+}
+
+/* --- MAIN CONTENT SECTIONS --- */
+main {
+    flex: 1; /* Permite que o conteúdo principal ocupe o espaço restante */
+    padding: 2rem 0;
+}
+
+section {
+    background: var(--light-text-color); /* Seções usam fundo branco */
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center; /* Alinhamento central padrão */
+}
+
+section h2 .fa-solid {
+    margin-right: 10px;
+    color: var(--secondary-color); /* Ícones de seção usam verde secundário */
+}
+
+/* --- ESTILOS PARA OS SLIDES --- */
+.slides-container {
+    background-color: var(--light-text-color); /* Fundo branco para o container dos slides */
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px auto;
+    width: 100%;
+    max-width: 700px;
+}
+
+.slide {
+    display: none;
+    padding: 1.5rem;
+    text-align: left; /* Conteúdo do slide alinhado à esquerda */
+    min-height: 250px;
+}
+
+.slide.active {
+    display: block;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.slide label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: var(--primary-color); /* Labels de formulário usam verde primário */
+}
+
+.slide input[type="text"],
+.slide input[type="number"],
+.slide select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: var(--font-secondary);
+    background-color: var(--light-text-color); /* Inputs com fundo branco */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.slide input:focus,
+.slide select:focus {
+    border-color: var(--secondary-color); /* Borda de foco usa verde secundário */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(60, 179, 113, 0.2); /* Sombra de foco RGBA do verde secundário */
+}
+
+.options-vertical label {
+    font-weight: normal;
+    display: flex; /* Para alinhar o rádio/checkbox com o texto */
+    align-items: center;
+    margin-bottom: 0.8rem;
+    cursor: pointer;
+    padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-color); /* Fundo das opções do rádio */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.options-vertical label:hover {
+    background-color: #EBF7EE; /* Tom mais claro de verde para hover */
+    border-color: var(--secondary-color);
+}
+
+.options-vertical input[type="radio"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+}
+
+.slide-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.5rem;
+}
+
+button {
+    background-color: var(--secondary-color); /* Botões usam verde secundário */
+    color: var(--light-text-color);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: var(--font-primary);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background-color: var(--primary-color); /* Botões em hover usam verde primário */
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#finish-btn {
+    background-color: var(--accent-color); /* Botão final com verde de destaque */
+}
+#finish-btn:hover {
+    background-color: #3C8D40; /* Tom mais escuro do verde de destaque para hover */
+}
+
+/* Seção de Relatório */
+#relatorio-section {
+    text-align: left; /* Alinha o texto do relatório à esquerda */
+}
+
+#profile-summary {
+    background-color: var(--bg-color); /* Fundo do resumo de perfil */
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.05); /* Sombra interna sutil */
+}
+
+#profile-summary p {
+    text-align: left; /* Alinha o texto do parágrafo à esquerda */
+    margin-bottom: 10px;
+}
+
+#profile-summary h4 {
+    color: var(--secondary-color); /* Títulos dentro do resumo usam verde secundário */
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    text-align: left;
+}
+
+#profile-summary ul {
+    list-style: disc; /* Marcadores de lista */
+    margin-left: 20px;
+    padding-left: 0;
+}
+
+#profile-summary li {
+    margin-bottom: 5px;
+}
+
+.chart-container {
+    max-width: 600px; /* Limita o tamanho do gráfico para melhor visualização */
+    margin: 30px auto 0;
+    padding: 20px;
+    background-color: var(--light-text-color); /* Fundo branco para o container do gráfico */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.chart-container h3 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--primary-color); /* Título do gráfico usa verde primário */
+}
+
+/* Estilos para tabelas de dados econômicos e investimentos */
+.styled-table {
+    width: 100%;
+    border-collapse: collapse; /* Colapsa as bordas das células */
+    margin: 25px 0;
+    font-size: 0.9em;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    border-radius: 5px 5px 0 0;
+    overflow: hidden; /* Garante que o border-radius seja aplicado nas bordas da tabela */
+}
+
+.styled-table thead tr {
+    background-color: var(--primary-color); /* Cabeçalho da tabela usa verde primário */
+    color: var(--light-text-color);
+    text-align: left;
+}
+
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid var(--border-color); /* Borda inferior para cada linha */
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3; /* Efeito "zebrado" com cinza claro */
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 2px solid var(--primary-color); /* Borda inferior mais espessa com verde primário */
+}
+
+/* Formulário de Contato */
+#contato-section {
+    text-align: center;
+}
+
+#contact-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    background-color: var(--light-text-color); /* Fundo do formulário branco */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: left; /* Alinha o conteúdo do formulário à esquerda */
+}
+
+.btn-submit {
+    background-color: var(--primary-color); /* Botão de submissão usa verde primário */
+    color: var(--light-text-color);
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-submit:hover {
+    background-color: var(--secondary-color); /* Botão de submissão em hover usa verde secundário */
+    transform: translateY(-2px);
+}
+
+.error-message {
+    color: #dc3545; /* Vermelho para mensagens de erro (mantido para clareza de erro) */
+    font-size: 0.85em;
+    margin-top: 5px;
+    display: block;
+}
+
+/* --- FOOTER --- */
+footer {
+    background-color: var(--dark-bg); /* Rodapé mantém fundo escuro */
+    color: var(--light-text-color);
+    padding: 40px 0 20px;
+    font-size: 0.9em;
+    margin-top: auto; /* Empurra o rodapé para o final da página */
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column; /* Em mobile, as seções ficam em coluna */
+    gap: 25px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.footer-section {
+    flex: 1;
+    padding: 10px;
+}
+
+.footer-section h3 {
+    color: var(--accent-color); /* Títulos do rodapé usam verde de destaque */
+    margin-bottom: 15px;
+    font-size: 1.1em;
+}
+
+.footer-section p,
+.footer-section ul {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 8px;
+}
+
+.footer-section ul li a {
+    color: var(--light-text-color); /* Links do rodapé brancos */
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+    opacity: 1;
+    text-decoration: none;
+}
+
+.social-icons {
+    margin-top: 15px;
+}
+
+.social-icons a {
+    color: var(--light-text-color);
+    font-size: 1.6em;
+    margin: 0 10px;
+    transition: transform 0.3s ease;
+}
+
+.social-icons a:hover {
+    transform: scale(1.2);
+}
+
+.copyright {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* --- MEDIA QUERIES para Responsividade (Desktop) --- */
+@media (min-width: var(--mobile-breakpoint)) {
+    header h1 {
+        font-size: 2.2em;
+    }
+
+    .menu-toggle {
+        display: none; /* Esconde o botão de menu em desktop */
+    }
+
+    .nav-menu {
+        display: flex;
+        flex-direction: row;
+        width: auto;
+        margin-top: 0;
+        background-color: transparent;
+    }
+
+    .nav-menu li {
+        margin: 0 15px;
+    }
+
+    .nav-menu a {
+        background-color: transparent;
+    }
+
+    /* Rodapé: muda para layout em linha em desktop */
+    .footer-content {
+        flex-direction: row;
+        text-align: left;
+        justify-content: space-between;
+    }
+
+    /* Macro Layout com CSS Grid para o conteúdo principal */
+    main.container { /* Aplica o grid ao main quando dentro do container */
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Duas colunas */
+        gap: 2rem; /* Espaçamento entre as colunas */
+        align-items: start; /* Alinha os itens no topo */
+    }
+
+    /* Regras para fazer seções específicas ocuparem a largura total no layout de grid */
+    #relatorio-section,
+    #dados-economicos-section,
+    #investimentos-section,
+    #contato-section { /* Adicionado contato também para ocupar a largura total */
+        grid-column: 1 / span 2; /* Ocupa as duas colunas */
+    }
+
+    section {
+        margin-bottom: 0; /* Remove a margem extra entre as seções no layout de grid */
+    }
+}
